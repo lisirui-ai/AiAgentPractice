@@ -216,3 +216,7 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+./env
+
+# HuggingFace / SentenceTransformers 模型缓存
+model_cache/
