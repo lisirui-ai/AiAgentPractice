@@ -127,21 +127,21 @@ AiAgentPractice/
 > **版本说明**：2025 年 10 月 LangChain v1.0 正式发布；遗留类（`AgentExecutor` / `LLMChain` 等）移至 `langchain-classic` 维护；v0.3.x 维护至 2026 年 12 月。
 
 
-| 章节              | 内容                                                                                     |
-| --------------- | -------------------------------------------------------------------------------------- |
-| 一、安装与环境配置       | `langchain` · `langchain-openai` · `langchain-community` · `langchain-chroma` · `python-dotenv` |
-| 二、架构概览          | Runnable 接口 · LCEL 组合范式 · 核心组件关系图                                                     |
-| 三、Chat Model    | `ChatOpenAI` · `invoke()` / `stream()` · 消息类型（HumanMessage / AIMessage / SystemMessage）  |
-| 四、Prompt Template | `ChatPromptTemplate` · `from_messages()` · 变量插值 · 多轮对话模板                               |
-| 五、Output Parser | `StrOutputParser` · `JsonOutputParser` · `PydanticOutputParser` · 格式化指令注入               |
-| 六、LCEL 链式组合    | `\|` 管道操作符 · `RunnableParallel` · `RunnableBranch` · `RunnableLambda`                   |
-| 七、对话记忆          | `ChatMessageHistory` · `RunnableWithMessageHistory` · 多 session 隔离                     |
-| 八、RAG           | `RecursiveCharacterTextSplitter` · Chroma 向量库 · `create_retrieval_chain` · 上下文感知问答     |
-| 九、Tool 与 Agent  | `@tool` 装饰器 · `create_agent()` · 工具调用循环 · 自定义工具实现                                     |
-| 十、结构化输出         | `with_structured_output()` · Pydantic 模型约束 · JSON Schema 输出                           |
-| 十一、完整端到端流程      | RAG + Agent 一键跑通：文档入库 → 检索 → LLM 生成 → 工具调用                                           |
-| 十二、补充知识点        | LLMs vs Chat Model · Token 计算 · 异步调用 · Callbacks · 旧链迁移指南                             |
-| 十三、总结           | 组件速查表 · LCEL vs 旧式 Chain · 框架选型建议                                                     |
+| 章节                | 内容                                                                                                                                    |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| 一、安装与环境配置         | `langchain` · `langchain-openai` · `langchain-community` · `langchain-chroma` · `python-dotenv`                                       |
+| 二、LangChain 架构概览  | Runnable 接口 · LCEL 组合范式 · 核心组件一览表 · 包结构说明                                                                                           |
+| 三、Chat Model      | `init_chat_model()` 统一初始化 · `ChatOpenAI` · 流式输出 · 批量调用                                                                               |
+| 四、Prompt Template | `ChatPromptTemplate` · `from_messages()` · 变量插值 · Few-Shot 少样本提示词                                                                     |
+| 五、Output Parser   | `StrOutputParser` · `JsonOutputParser` · `CommaSeparatedListOutputParser`                                                             |
+| 六、LCEL 链式组合      | `\|` 管道操作符 · `RunnablePassthrough` · `RunnableLambda` · `RunnableParallel` · 串联多个管道                                                      |
+| 七、对话记忆            | `InMemoryChatMessageHistory` · `RunnableWithMessageHistory` · 消息裁剪与窗口控制                                                               |
+| 八、RAG             | 文档加载 · `RecursiveCharacterTextSplitter` · Chroma 向量库 · 完整 RAG 链 · 高级检索器                                                               |
+| 九、Tool 与 Agent    | `@tool` 装饰器 · `StructuredTool` · 内置工具 · MCP 工具接入 · `create_agent()` · 工具异常处理                                                          |
+| 十、结构化输出           | `with_structured_output()` · Pydantic 模型约束 · JSON Schema 输出                                                                         |
+| 十一、完整端到端流程        | RAG + Agent 一键跑通：文档入库 → 检索 → LLM 生成 → 工具调用                                                                                          |
+| 十二、补充知识点          | LLMs vs Chat Model · Token · 消息类型 · 异步调用 · 多平台接入 · PromptTemplate · RunnablePassthrough.assign · RunnableParallel · RunnableBranch · create_stuff_documents_chain · Callbacks · 旧链迁移 |
+| 十三、总结             | 组件速查表 · LCEL vs 旧式 Chain · 框架选型建议                                                                                                    |
 
 
 > **LCEL 核心优势** · 所有组件（Chat Model / Prompt / Parser / Retriever / Tool）均实现统一 `Runnable` 接口（`invoke` / `batch` / `stream`），通过 `|` 管道操作符自由组合；LCEL 链天然支持流式输出、批量处理、异步调用及 LangSmith 追踪，无需修改代码即可切换执行模式。
@@ -159,22 +159,22 @@ AiAgentPractice/
 > **核心理念**：LangGraph 将 AI 工作流建模为 **节点（Node）** 和 **边（Edge）** 的有向图，天然支持循环、条件分支、多 Agent 并行协作以及状态持久化与时间旅行回溯。
 
 
-| 章节                 | 内容                                                                                            |
-| ------------------ | --------------------------------------------------------------------------------------------- |
-| 一、安装与环境配置          | `langgraph==1.2.9` · `langgraph-checkpoint-sqlite` · `langgraph-supervisor` · `python-dotenv` |
-| 二、架构概览             | 四大核心要素（State / Node / Edge / Graph）· `StateGraph` 执行本质 · 与 LangChain LCEL 的关系                |
-| 三、State（状态）        | `TypedDict` / `Pydantic` 状态定义 · `Annotated` + `Reducer` 状态合并策略 · `MessagesState` 内置状态        |
-| 四、Node（节点）         | 函数签名规范 · `functools.partial` 注入参数 · `RetryPolicy` 自动重试 · `CachePolicy` 结果缓存                  |
-| 五、Edge（边）          | 普通边（无条件跳转）· 条件边（`add_conditional_edges`）· 条件入口点（`set_conditional_entry_point`）             |
-| 六、Graph 构建流程       | `StateGraph` → `add_node` → `add_edge` → `compile()` · `CompiledGraph` 调用方式                  |
-| 七、特殊 API           | `Send`（动态扇出并行）· `Command`（节点内跳转 + 状态更新）· `RuntimeContext`（运行时上下文注入）                         |
-| 八、Streaming 流式输出   | `stream()` 四种模式（values / updates / messages / debug）· 异步流 · Token 级输出                        |
-| 九、持久化（Checkpointer） | `SqliteSaver` · `PostgresSaver` · `thread_id` 多会话隔离 · 中断恢复（`interrupt_before`）              |
-| 十、时间旅行（Time Travel） | `get_state()` · `get_state_history()` · `update_state()` · 历史状态回放与分支重执行                     |
-| 十一、子图（SubGraph）    | `StateGraph` 嵌套 · 父子图状态传递协议 · `CompiledGraph` 作为父图节点                                         |
-| 十二、多 Agent 系统      | `create_agent()` 创建单 Agent · Supervisor 模式（`langgraph-supervisor`）· 多 Agent 架构模式对比           |
-| 十三、完整端到端实战         | 旅行预订助手：State 定义 → 多节点图 → 工具调用 → 条件路由 → 持久化一键跑通                                              |
-| 十四、总结              | 核心概念速查表 · LangGraph vs LangChain Agent 对比 · 框架选型指南                                           |
+| 章节                   | 内容                                                                                            |
+| -------------------- | --------------------------------------------------------------------------------------------- |
+| 一、安装与环境配置            | `langgraph==1.2.9` · `langgraph-checkpoint-sqlite` · `langgraph-supervisor` · `python-dotenv` |
+| 二、架构概览               | 四大核心要素（State / Node / Edge / Graph）· `StateGraph` 执行本质 · 最小完整示例（Hello LangGraph）           |
+| 三、State（状态）          | `TypedDict` / `Pydantic` 状态定义 · `Annotated` + `Reducer` 状态合并策略 · `StateSchema` 状态模式          |
+| 四、Node（节点）           | 函数签名规范 · `functools.partial` 注入参数 · `RetryPolicy` 自动重试 · `CachePolicy` 结果缓存                  |
+| 五、Edge（边）            | 普通边（无条件跳转）· 条件边（`add_conditional_edges`）· 条件入口点（`set_conditional_entry_point`）             |
+| 六、Graph 构建流程         | `StateGraph` → `add_node` → `add_edge` → `compile()` · 可视化图结构 · 链式 Builder 写法               |
+| 七、特殊 API             | `Send`（动态扇出并行）· `Command`（节点内跳转 + 状态更新）· `RuntimeContext`（运行时上下文注入）                         |
+| 八、Streaming 流式输出     | `stream()` 四种模式（values / updates / messages / debug）· `interrupt_before` / `interrupt_after` 节点级暂停 |
+| 九、持久化（Checkpointer）  | `InMemorySaver` · `SqliteSaver` · `thread_id` 多会话隔离 · 中断恢复                                   |
+| 十、时间旅行（Time Travel）  | `get_state()` · `get_state_history()` · `update_state()` · 历史状态回放与分支重执行                     |
+| 十一、子图（SubGraph）      | State 共享与不共享两种嵌套模式 · 父子图状态传递协议 · `CompiledGraph` 作为父图节点                                     |
+| 十二、多 Agent 系统        | `create_agent()` 创建单 Agent · Supervisor 模式（`langgraph-supervisor`）· Agent 四种 Stream 模式 · `handoff` Agent 间控制权移交  |
+| 十三、完整端到端实战           | 旅行预订助手：State 定义 → 多节点图 → 工具调用 → 条件路由 → 持久化一键跑通                                              |
+| 十四、总结                | 核心知识点回顾 · 框架选型决策树 · 知识体系全景图 · 常用命令速查                                                        |
 
 
 > **LangGraph 与 LangChain Agent 的区别** · LangChain Agent（LCEL 链）适合线性的单轮工具调用场景；LangGraph 以有向图为核心，支持**循环**（节点可多次执行）、**条件分支**（条件边动态路由）、**状态持久化**（Checkpointer 跨会话恢复）及**多 Agent 协作**（子图 + Supervisor），是构建复杂、有状态 AI Agent 应用的首选方案。
