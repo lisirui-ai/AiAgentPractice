@@ -269,7 +269,7 @@ Agent 编排框架层
 **1. 克隆仓库**
 
 ```bash
-git clone https://github.com/your-username/AiAgentPractice.git
+git clone git@github.com:lisirui-ai/AiAgentPractice.git
 cd AiAgentPractice
 ```
 
